@@ -1004,6 +1004,34 @@ local function _registerBuiltins()
         _browseModeDescriptor("browse_authors", _("Authors"), Config.ICON.author, "author"),
         _browseModeDescriptor("browse_series",  _("Series"),  Config.ICON.series, "series"),
         _browseModeDescriptor("browse_tags",    _("Tags"),    Config.ICON.tags,   "tags"),
+        {
+            id          = "zlibrary",
+            label       = _("Z-Library"),
+            icon        = Config.ICON.zlibrary,
+            is_in_place = false,
+            execute     = function(ctx)
+                local fm = (ctx and ctx.fm) or _liveFM()
+                local ZL = fm and fm.zlibrary
+                if not ZL then
+                    local ok, ZMod = pcall(require, "zlibrary")
+                    if ok and ZMod and ZMod.instance then ZL = ZMod.instance end
+                end
+                if not ZL then
+                    local ok, ZMod = pcall(require, "plugins/zlibrary.koplugin/main")
+                    if ok and ZMod and ZMod.instance then ZL = ZMod.instance end
+                end
+                if ZL and ZL.onShowZLibrary then
+                    if ctx and ctx.already_active and ZL.destinationselector and ZL.destinationselector.indexPage then
+                        ZL.destinationselector:indexPage()
+                    else
+                        ZL:onShowZLibrary()
+                    end
+                else
+                    local su = (ctx and ctx.show_unavailable) or _unavailToast
+                    su(_("Z-Library plugin is not available."))
+                end
+            end,
+        },
     }
 
     for _, desc in ipairs(builtins) do

@@ -1358,6 +1358,17 @@ function M.BarInjection.allIds()
     return result
 end
 
+-- Default Bar Injection registrations
+M.BarInjection.register{
+    id = 'zlibrary',
+    widget_name = 'zlibrarybrowser',
+    match = function(widget)
+        return widget.name == 'zlibrarybrowser' or (widget.title == 'Z-Library' and widget.is_borderless)
+    end,
+    active_action_id = 'zlibrary',
+    is_pageable = true,
+}
+
 -- ---------------------------------------------------------------------------
 -- Notify — shared notices.
 --

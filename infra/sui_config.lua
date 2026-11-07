@@ -86,6 +86,7 @@ M.ICON = {
     author         = "nerd:E712",  -- person           (SUIStyle.author)
     series         = "nerd:E7BA",  -- stacked books    (SUIStyle.series)
     tags           = "nerd:EBF8",  -- tag              (SUIStyle.tags)
+    zlibrary       = _P .. "zlibrary.svg",
     nav_prev       = "nerd:E840",  -- chevron left
     nav_next       = "nerd:E841",  -- chevron right
     ko_home        = "nerd:ED9F",  -- house outline
@@ -144,6 +145,7 @@ M.ALL_ACTIONS = {
       browsemeta_mode = "series" },
     { id = "browse_tags",      label = _("Tags"),             icon = M.ICON.tags,
       browsemeta_mode = "tags" },
+    { id = "zlibrary",         label = _("Z-Library"),        icon = M.ICON.zlibrary    },
 }
 
 M.ACTION_BY_ID = {}

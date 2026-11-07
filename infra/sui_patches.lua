@@ -1918,8 +1918,20 @@ end
 
 -- Activates the navbar tab that matches the widget and returns the action
 -- that became active, or nil when the widget has no tab.
-local function _activateWidgetTab(plugin, widget, tabs)
+local function _activateWidgetTab(plugin, widget, tabs, desc)
     local tabs_set = tabsToSet(tabs)
+    if desc then
+        local bi_action
+        if type(desc.get_active_action) == "function" then
+            local ok, result = pcall(desc.get_active_action, widget)
+            bi_action = ok and result or nil
+        else
+            bi_action = desc.active_action_id
+        end
+        if bi_action and tabs_set[bi_action] then
+            return Bottombar.setActiveAndRefreshFM(plugin, bi_action, tabs)
+        end
+    end
     local name = widget.name
     if name == "collections" and Config.isFavoritesWidget(widget) and tabs_set["favorites"] then
         return Bottombar.setActiveAndRefreshFM(plugin, "favorites", tabs)
@@ -2095,7 +2107,7 @@ local function _injectNavbar(ctx)
     -- the one being opened.
     local action_before = plugin._navbar_prev_action_pending or plugin.active_action
     plugin._navbar_prev_action_pending = nil
-    local display_action = _activateWidgetTab(plugin, widget, tabs) or action_before
+    local display_action = _activateWidgetTab(plugin, widget, tabs, desc) or action_before
     if not widget._navbar_inner then widget._navbar_inner = widget[1] end
 
     -- Non-pageable widgets get a bar without page arrows from the start.

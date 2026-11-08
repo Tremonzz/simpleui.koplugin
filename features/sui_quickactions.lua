@@ -1013,6 +1013,22 @@ local function _registerBuiltins()
                 local fm = (ctx and ctx.fm) or _liveFM()
                 local ZL = fm and fm.zlibrary
                 if not ZL then
+                    local ok_pl, PluginLoader = pcall(require, "pluginloader")
+                    if ok_pl and PluginLoader and PluginLoader.getPluginInstance then
+                        ZL = PluginLoader:getPluginInstance("zlibrary")
+                    end
+                end
+                if not ZL then
+                    for k, v in pairs(package.loaded) do
+                        if type(k) == "string" and k:find("zlibrary", 1, true) then
+                            if type(v) == "table" and v.instance then
+                                ZL = v.instance
+                                break
+                            end
+                        end
+                    end
+                end
+                if not ZL then
                     local ok, ZMod = pcall(require, "zlibrary")
                     if ok and ZMod and ZMod.instance then ZL = ZMod.instance end
                 end
@@ -1020,13 +1036,19 @@ local function _registerBuiltins()
                     local ok, ZMod = pcall(require, "plugins/zlibrary.koplugin/main")
                     if ok and ZMod and ZMod.instance then ZL = ZMod.instance end
                 end
+                logger.dbg("simpleui zlibrary QA: resolved ZL=", tostring(ZL))
                 if ZL and ZL.onShowZLibrary then
-                    if ctx and ctx.already_active and ZL.destinationselector and ZL.destinationselector.indexPage then
+                    if ctx and ctx.already_active and ZL.destinationselector
+                            and UIManager:isWidgetShown(ZL.destinationselector)
+                            and ZL.destinationselector.indexPage then
+                        logger.dbg("simpleui zlibrary QA: refreshing indexPage")
                         ZL.destinationselector:indexPage()
                     else
+                        logger.dbg("simpleui zlibrary QA: calling onShowZLibrary")
                         ZL:onShowZLibrary()
                     end
                 else
+                    logger.warn("simpleui zlibrary QA: plugin not available")
                     local su = (ctx and ctx.show_unavailable) or _unavailToast
                     su(_("Z-Library plugin is not available."))
                 end

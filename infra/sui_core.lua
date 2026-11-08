@@ -1367,6 +1367,12 @@ M.BarInjection.register{
     end,
     active_action_id = 'zlibrary',
     is_pageable = true,
+    on_close = function(widget)
+        local ok, ZL = pcall(require, 'main')
+        if ok and ZL and ZL.instance and ZL.instance.destinationselector == widget then
+            ZL.instance.destinationselector = nil
+        end
+    end,
 }
 
 -- ---------------------------------------------------------------------------
